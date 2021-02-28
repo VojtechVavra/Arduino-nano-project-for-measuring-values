@@ -2,6 +2,7 @@
 #define BP_SCALE_HX711_HPP
 
 #include "HX711.h"
+// RobTillaart/HX711 library
 
 // HX711 circuit wiring
 const int LOADCELL_DOUT_PIN = 4;
