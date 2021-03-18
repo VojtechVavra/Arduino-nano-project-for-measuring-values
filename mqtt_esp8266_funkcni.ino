@@ -21,16 +21,16 @@
 
 /************************* WiFi Access Point *********************************/
 
-#define WLAN_SSID       "Axa"
-#define WLAN_PASS       "Axorizer"
+#define WLAN_SSID       "ssid"
+#define WLAN_PASS       "pwd"
 
 /************************* Adafruit.io Setup *********************************/
 
 #define AIO_SERVER      "io.adafruit.com"
 #define AIO_SERVERPORT  1883                   // use 8883 for SSL
 // "...your AIO username (see https://accounts.adafruit.com)..."
-#define AIO_USERNAME    "Vooja"
-#define AIO_KEY         "aio_FOtH73iFe1GPQD9A602NpmwIIp8T"
+#define AIO_USERNAME    "username"
+#define AIO_KEY         "io_key"
 
 /************ Global State (you don't need to change this!) ******************/
 
