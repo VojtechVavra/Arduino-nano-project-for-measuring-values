@@ -61,15 +61,15 @@ void RFM95_Setup()
     // The default transmitter power is 13dBm, using PA_BOOST.
     // If you are using RFM95/96/97/98 modules which uses the PA_BOOST transmitter pin, then 
     // you can set transmitter powers from 5 to 23 dBm:
-    rf95.setTxPower(23, false);
+    rf95.setTxPower(11, false); // 23
 }
 
 void rfm95_send(Measurements measurements)
 {
     // Send a message to rf95_server
     String text = createMessage(measurements);
-    size_t text_len = text.length() + 1;
-    Serial.println("msg_len: " + text_len);
+    unsigned int text_len = text.length() + 1;  // size_t
+    Serial.println("  msg_len: " + text_len);
     char msg_buffer[MSG_LEN];
     text.toCharArray(msg_buffer, text_len);
     msg_buffer[text_len] = 0;
@@ -82,7 +82,34 @@ void rfm95_send(Measurements measurements)
     delay(10);
     rf95.waitPacketSent();
 
-    rfm95_waitForReply();
+    //rfm95_waitForReply();
+
+  // Wait for a reply
+  uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+  uint8_t len = sizeof(buf);
+ 
+  Serial.println("Waiting for reply ...");
+  delay(10);
+  
+  if (rf95.waitAvailableTimeout(WAIT_TIME_FOR_REPLY))
+  { 
+    // Should be a reply message for us now   
+    if (rf95.recv(buf, &len))
+   {
+      //Serial.print("Got reply: ");
+      Serial.println((char*)buf);
+      Serial.print("RSSI: ");
+      Serial.println(rf95.lastRssi(), DEC);    
+    }
+    else
+    {
+      Serial.println("Receive failed");
+    }
+  }
+  else
+  {
+    Serial.println("No reply, is there a listener around?");
+  }
 }
 
 void rfm95_waitForReply()
@@ -91,7 +118,7 @@ void rfm95_waitForReply()
   uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
   uint8_t len = sizeof(buf);
  
-  Serial.println("Waiting for reply...");
+  Serial.println("Waiting for reply ...");
   delay(10);
   
   if (rf95.waitAvailableTimeout(WAIT_TIME_FOR_REPLY))
@@ -129,7 +156,7 @@ String createMessage(Measurements measurements)
     msg += " ";
     msg += measurements.altitude;
     msg += " ";
-    msg += measurements.time;
+    //msg += measurements.time;
     
     return msg;
 }
