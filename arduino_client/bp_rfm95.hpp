@@ -61,7 +61,7 @@ void RFM95_Setup()
     // The default transmitter power is 13dBm, using PA_BOOST.
     // If you are using RFM95/96/97/98 modules which uses the PA_BOOST transmitter pin, then 
     // you can set transmitter powers from 5 to 23 dBm:
-    rf95.setTxPower(11, false); // 23
+    rf95.setTxPower(18, false); //  11 fungguje dobre a spoleehlive. Max je 23
 }
 
 void rfm95_send(Measurements measurements)
@@ -83,7 +83,7 @@ void rfm95_send(Measurements measurements)
     rf95.waitPacketSent();
 
     //rfm95_waitForReply();
-
+/*
   // Wait for a reply
   uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
   uint8_t len = sizeof(buf);
@@ -109,7 +109,7 @@ void rfm95_send(Measurements measurements)
   else
   {
     Serial.println("No reply, is there a listener around?");
-  }
+  }*/
 }
 
 void rfm95_waitForReply()
@@ -141,24 +141,6 @@ void rfm95_waitForReply()
     Serial.println("No reply, is there a listener around?");
   }
   //delay(1000);
-}
-
-String createMessage(Measurements measurements)
-{
-    String msg;
-    msg += measurements.weight;
-    msg += " ";
-    msg += measurements.temperature;
-    msg += " ";
-    msg += measurements.pressure;
-    msg += " ";
-    msg += measurements.humidity;
-    msg += " ";
-    msg += measurements.altitude;
-    msg += " ";
-    //msg += measurements.time;
-    
-    return msg;
 }
 
 #endif    // !BP_SENDER_HPP
