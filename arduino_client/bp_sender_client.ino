@@ -8,7 +8,7 @@
 #include "bp_scale_hx711.hpp"
 
 void setup() {
-  while (!Serial);
+  //while (!Serial);
   Serial.begin(9600);
   
   // OLED SSD1306
@@ -47,20 +47,21 @@ void loop()
     String text = createMessage(mData);
     unsigned int text_len = text.length() + 1;  // size_t
     Serial.println("  msg_len: " + text_len);
-    char msg_buffer[MSG_LEN];
+    char msg_buffer[text_len] = {0};            // MSG_LEN
     text.toCharArray(msg_buffer, text_len);
-    msg_buffer[text_len] = 0;
+    msg_buffer[text_len - 1] = 0;
     
     Serial.println("Sending...");
     delay(10);
-    rf95.send((uint8_t *)msg_buffer, MSG_LEN);
+  
+    rf95.send((uint8_t *)msg_buffer, text_len);
     
     //Serial.println("Waiting for packet to complete...");
     delay(10);
     rf95.waitPacketSent();
 
-    //rfm95_waitForReply();
-
+  /*
+  //rfm95_waitForReply();
   // Wait for a reply
   uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
   uint8_t len = sizeof(buf);
@@ -87,9 +88,9 @@ void loop()
   {
     Serial.println("No reply, is there a listener around?");
   }
-  
+  */
      
    //Delay before repeating the loop.
-   delay(5000);  // 6000
+   delay(10000);  // 6000
    scale.power_up();
 }
