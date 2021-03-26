@@ -1,6 +1,4 @@
-//#include <SPI.h>
 #include <LoRa.h>
-
 #include <ESP8266WiFi.h>
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
@@ -14,15 +12,15 @@ const long frequency = 868E6;  // LoRa Frequency
 
 /************************* WiFi Access Point *********************************/
 
-#define WLAN_SSID       "Axa"
-#define WLAN_PASS       "Axorizer"
+#define WLAN_SSID       "SSID"
+#define WLAN_PASS       "PASSWD"
 
 /************************* Adafruit.io Setup *********************************/
 
 #define AIO_SERVER      "io.adafruit.com"
 #define AIO_SERVERPORT  1883                   // use 8883 for SSL
 // "...your AIO username (see https://accounts.adafruit.com)..."
-#define AIO_USERNAME    "Vooja"
+#define AIO_USERNAME    "Username"
 #define AIO_KEY         "aio_eiCm40uquRLGw3MXKdrZjj7MU481"
 
 
@@ -38,33 +36,38 @@ Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO
 
 // Setup a feed called 'photocell' for publishing.
 // Notice MQTT paths for AIO follow the form: <username>/feeds/<feedname>
-Adafruit_MQTT_Publish hmotnost = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/hmotnost");
-Adafruit_MQTT_Publish teplota = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/teplota");
-Adafruit_MQTT_Publish vlhkost = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/vlhkost");
-Adafruit_MQTT_Publish tlak = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/tlak");
+Adafruit_MQTT_Publish hmotnost = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/arduino-1.hmotnost");
+Adafruit_MQTT_Publish teplota = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/arduino-1.teplota");
+Adafruit_MQTT_Publish vlhkost = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/arduino-1.vlhkost");
+Adafruit_MQTT_Publish tlak = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/arduino-1.tlak");
 
 // Setup a feed called 'onoff' for subscribing to changes.
-Adafruit_MQTT_Subscribe onoffbutton = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAME "/feeds/onoff");
+//Adafruit_MQTT_Subscribe onoffbutton = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAME "/feeds/onoff");
 
+void onReceive(int packetSize);
+void sendMessage(String outgoing);
 void MQTT_connect();
-
 String getValue(String data, char separator, int index);
 
 //int32_t v_hmotnost = 0;
+byte sync_word[4];
+String v_device;
 float v_hmotnost = 0;
 float v_teplota = 0;
-float v_vlhkost = 0;
 float v_tlak = 0;
+float v_vlhkost = 0;
 
-void setup() {
+
+void setup()
+{
   Serial.begin(115200);
   delay(1000); 
-  while (!Serial){
+  /*while (!Serial){
       Serial.println("Serial failed!");
       delay(1000);
       //break;
-  };
-  delay(1000); 
+  };*/
+  //delay(1000); 
   Serial.println("LoRa Receiver init");
   LoRa.setPins(csPin, resetPin, irqPin);
     
@@ -72,6 +75,7 @@ void setup() {
     Serial.println("Starting LoRa failed!");
     while (1);
   }
+  Serial.println("LoRa init succeeded.");
 
   // Connect to WiFi access point.
   Serial.println(); Serial.println();
@@ -89,14 +93,22 @@ void setup() {
   Serial.println("IP address: "); Serial.println(WiFi.localIP());
 
   // Setup MQTT subscription for onoff feed.
-  mqtt.subscribe(&onoffbutton);
+  //mqtt.subscribe(&onoffbutton);
 }
 
-void loop() {
-  MQTT_connect();
-  // try to parse packet
-  int packetSize = LoRa.parsePacket();
-  if (packetSize) {
+void loop()
+{
+   // parse for a packet, and call onReceive with the result:
+  onReceive(LoRa.parsePacket());
+}
+
+void onReceive(int packetSize)
+{
+   // try to parse packet
+   if (packetSize == 0) return;          // if there's no packet, return
+
+    MQTT_connect();
+    
     // received a packet
     Serial.print("Received packet '");
 
@@ -112,14 +124,24 @@ void loop() {
     Serial.print("' with RSSI ");
     Serial.println(LoRa.packetRssi());
 
-    String xval = getValue(receivedText, ' ', 0);
-    String textHmostnost = String(receivedText[4]) + String(receivedText[5]) + String(receivedText[6]) + String(receivedText[7]);
-    v_hmotnost = textHmostnost.toFloat();
-    //Serial.println("receivedText: " + );
-    //v_hmotnost = (xval.substring(3)).toFloat();
-    v_teplota = getValue(receivedText, ' ', 1).toFloat();
-    v_vlhkost = getValue(receivedText, ' ', 2).toFloat();
-    v_tlak = getValue(receivedText, ' ', 3).toFloat();
+    Serial.println("sync_word message in hexa:");
+    Serial.print(receivedText[0], HEX);
+    Serial.print(receivedText[1], HEX);
+    Serial.print(receivedText[2], HEX);
+    Serial.print(receivedText[3], HEX);
+
+    v_device = getValue(receivedText, ' ', 1);
+    v_hmotnost = getValue(receivedText, ' ', 2).toFloat();
+    v_teplota = getValue(receivedText, ' ', 3).toFloat();
+    v_tlak = getValue(receivedText, ' ', 4).toFloat();
+    v_vlhkost = getValue(receivedText, ' ', 5).toFloat();
+
+    if(v_device != "arduino_1") {
+      return;
+    }
+
+    Serial.print(F("\nGot message from device: "));
+    Serial.println(v_device);
     
     // Now we can publish stuff!
     Serial.print(F("\nZasilam hmotnost "));
@@ -131,22 +153,14 @@ void loop() {
       Serial.println(F("OK!"));
     }
     
-    Serial.print(F("\nZasilam teplota "));
+    Serial.print(F("\nZasilam teplotu "));
     Serial.println(v_teplota);
     if (! teplota.publish(v_teplota)) {
       Serial.println(F("Failed"));
     } else {
       Serial.println(F("OK!"));
     }
-  
-    Serial.print(F("\nZasilam vlhkost "));
-    Serial.println(v_vlhkost);
-    if (! vlhkost.publish(v_vlhkost)) {
-      Serial.println(F("Failed"));
-    } else {
-      Serial.println(F("OK!"));
-    }
-  
+
     Serial.print(F("\nZasilam tlak "));
     Serial.println(v_tlak);
     if (! tlak.publish(v_tlak)) {
@@ -154,8 +168,14 @@ void loop() {
     } else {
       Serial.println(F("OK!"));
     }
-      
-  }
+    
+    Serial.print(F("\nZasilam vlhkost "));
+    Serial.println(v_vlhkost);
+    if (! vlhkost.publish(v_vlhkost)) {
+      Serial.println(F("Failed"));
+    } else {
+      Serial.println(F("OK!"));
+    }
 }
 
 // Function to connect and reconnect as necessary to the MQTT server.
