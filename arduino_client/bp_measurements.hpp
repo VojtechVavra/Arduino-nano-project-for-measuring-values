@@ -14,6 +14,8 @@ String createMessage(Measurements measurements)
 {
     String msg = "";
     msg += " ";
+    msg += "arduino_1";
+    msg += " ";
     msg += measurements.weight;
     msg += " ";
     msg += measurements.temperature;
