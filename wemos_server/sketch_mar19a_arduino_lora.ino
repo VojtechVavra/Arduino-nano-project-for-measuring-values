@@ -5,7 +5,7 @@
 
 
 const int csPin = 15;          // LoRa radio chip select
-const int resetPin = 16;        // LoRa radio reset
+const int resetPin = 16;       // LoRa radio reset
 const int irqPin = 5;          // 5 - DIO0, change for your board; must be a hardware interrupt pin
 
 const long frequency = 868E6;  // LoRa Frequency
