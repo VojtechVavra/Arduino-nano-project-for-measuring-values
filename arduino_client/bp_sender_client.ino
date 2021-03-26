@@ -63,7 +63,7 @@ void loop()
     
    //Delay before repeating the loop.
    //60 minutes each of 60 seconds each of 1000 milliseconds all unsigned longs
-   delay(60UL * 60UL * 1000UL - 20);
+   delay(60UL * 60UL * 1000UL - 5020);   // - 20
    //delay(10000);  // 10 * 1000
    scale.power_up();
 }
