@@ -27,4 +27,5 @@ String createMessage(Measurements measurements)
     
     return msg;
 }
+
 #endif    // !BP_MEASUREMENTS_HPP
