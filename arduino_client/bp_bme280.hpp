@@ -1,7 +1,6 @@
 #ifndef BP_BME280_HPP
 #define BP_BME280_HPP
 
-// --- BME280 - teplota, vlhkost, tlak
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
@@ -9,9 +8,9 @@
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
+// ---- BME280 - teplota, vlhkost, tlak
 Adafruit_BME280 bme;
 
-// ---- BME280 - teplota, vlhkost, tlak
 void BME280_Setup()
 {
   // BME280
@@ -45,5 +44,4 @@ void printBME280()
     Serial.println();
 }
 
-  
 #endif    // !BP_BME280_HPP
