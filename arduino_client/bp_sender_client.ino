@@ -43,22 +43,7 @@ void loop()
      
     scale.power_down();     // put the ADC in sleep mode
     
-    // Send a message to rf95_server
-    String text = createMessage(mData);
-    unsigned int text_len = text.length() + 1;  // size_t
-    Serial.println("  msg_len: " + text_len);
-    char msg_buffer[text_len] = {0};            // MSG_LEN
-    text.toCharArray(msg_buffer, text_len);
-    msg_buffer[text_len - 1] = 0;
-    
-    Serial.println("Sending...");
-    delay(10);
-  
-    rf95.send((uint8_t *)msg_buffer, text_len);
-    
-    //Serial.println("Waiting for packet to complete...");
-    delay(10);
-    rf95.waitPacketSent();
+    rfm95_send(mData);
     Serial.println("Sent");
     
    //Delay before repeating the loop.
