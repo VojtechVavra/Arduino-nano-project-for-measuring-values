@@ -118,14 +118,17 @@ void onReceive(int packetSize)
    Serial.print(receivedText[2], HEX);
    Serial.print(receivedText[3], HEX);
 
-   v_device = getValue(receivedText, ' ', 1);
-   v_hmotnost = getValue(receivedText, ' ', 2).toFloat();
-   v_teplota = getValue(receivedText, ' ', 3).toFloat();
-   v_tlak = getValue(receivedText, ' ', 4).toFloat();
-   v_vlhkost = getValue(receivedText, ' ', 5).toFloat();
-
-   if(v_device != "arduino_1") {
-      return;
+   //v_device = getValue(receivedText, ' ', 1);
+   //v_hmotnost = getValue(receivedText, ' ', 2).toFloat();
+   //v_teplota = getValue(receivedText, ' ', 3).toFloat();
+   //v_tlak = getValue(receivedText, ' ', 4).toFloat();
+   //v_vlhkost = getValue(receivedText, ' ', 5).toFloat();
+  
+   char device[20];
+   char sync_word[10];
+   int n = sscanf(receivedText, "%s %s %f %f %f %f", sync_word, v_device, &v_hmotnost, &v_teplota, &v_tlak, &v_vlhkost);
+   if (n != 6 || v_device != "arduino_1"){
+       return;
    }
    
    //rfm95_sendReply();
@@ -195,7 +198,7 @@ void MQTT_connect() {
   Serial.println("MQTT Connected!");
 }
 
-String getValue(String data, char separator, int index)
+/*String getValue(String data, char separator, int index)
 {
     int found = 0;
     int strIndex[] = { 0, -1 };
@@ -209,7 +212,7 @@ String getValue(String data, char separator, int index)
         }
     }
     return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
-}
+}*/
 
 void rfm95_sendReply()
 {
