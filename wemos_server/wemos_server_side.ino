@@ -41,6 +41,7 @@ void onReceive(int packetSize);
 void sendMessage(String outgoing);
 void MQTT_connect();
 String getValue(String data, char separator, int index);
+rfm95_sendReply();
 
 byte sync_word[4];
 String v_device;
@@ -134,7 +135,7 @@ void onReceive(int packetSize)
    Serial.print(F("\nZasilam hmotnost "));
    Serial.println(v_hmotnost);
   
-   if (! hmotnost.publish(v_hmotnost)) {
+   if (!hmotnost.publish(v_hmotnost)) {
       Serial.println(F("Failed"));
    } else {
       Serial.println(F("OK!"));
@@ -142,7 +143,7 @@ void onReceive(int packetSize)
     
    Serial.print(F("\nZasilam teplotu "));
    Serial.println(v_teplota);
-   if (! teplota.publish(v_teplota)) {
+   if (!teplota.publish(v_teplota)) {
       Serial.println(F("Failed"));
    } else {
       Serial.println(F("OK!"));
@@ -150,7 +151,7 @@ void onReceive(int packetSize)
 
    Serial.print(F("\nZasilam tlak "));
    Serial.println(v_tlak);
-   if (! tlak.publish(v_tlak)) {
+   if (!tlak.publish(v_tlak)) {
       Serial.println(F("Failed"));
    } else {
       Serial.println(F("OK!"));
@@ -206,4 +207,22 @@ String getValue(String data, char separator, int index)
         }
     }
     return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
+}
+
+void rfm95_sendReply()
+{
+    // Send a reply message
+    Serial.println("Sending reply message");
+    
+    byte syncWord[2] = {0xFF, 0xFF};
+    String syncWordTex = (char*)syncWord;
+    String text = syncWordTex + "  Got message";
+    
+    Serial.println("Sending reply: " + text);
+    delay(10);
+    
+    LoRa.beginPacket();
+    LoRa.print(text);
+    LoRa.endPacket();
+    //Serial.println("Reply message sent");
 }
