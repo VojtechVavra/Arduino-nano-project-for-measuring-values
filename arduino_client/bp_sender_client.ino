@@ -45,6 +45,7 @@ void loop()
     
     rfm95_send(mData);
     Serial.println("Sent");
+    //rfm95_waitForReply();
     
    //Delay before repeating the loop.
    //60 minutes each of 60 seconds each of 1000 milliseconds all unsigned longs
