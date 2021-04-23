@@ -127,7 +127,9 @@ void onReceive(int packetSize)
    if(v_device != "arduino_1") {
       return;
    }
-
+   
+   //rfm95_sendReply();
+  
    Serial.print(F("\nGot message from device: "));
    Serial.println(v_device);
     
