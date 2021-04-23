@@ -8,6 +8,7 @@ const int resetPin = 16;       // LoRa radio reset
 const int irqPin = 5;          // 5 - DIO0, change for your board; must be a hardware interrupt pin
 
 const long frequency = 868E6;  // LoRa Frequency
+const int sync_word_length = 4;
 
 /************************* WiFi Access Point *********************************/
 #define WLAN_SSID       "SSID"
@@ -43,12 +44,12 @@ void MQTT_connect();
 String getValue(String data, char separator, int index);
 rfm95_sendReply();
 
-byte sync_word[4];
+/*byte sync_word[4];
 String v_device;
 float v_hmotnost = 0;
 float v_teplota = 0;
 float v_tlak = 0;
-float v_vlhkost = 0;
+float v_vlhkost = 0;*/
 
 
 void setup()
@@ -124,13 +125,21 @@ void onReceive(int packetSize)
    //v_tlak = getValue(receivedText, ' ', 4).toFloat();
    //v_vlhkost = getValue(receivedText, ' ', 5).toFloat();
   
-   char device[20];
+   /*char device[20];
    char sync_word[10];
    int n = sscanf(receivedText, "%s %s %f %f %f %f", sync_word, v_device, &v_hmotnost, &v_teplota, &v_tlak, &v_vlhkost);
    if (n != 6 || v_device != "arduino_1"){
        return;
-   }
+   }*/
    
+    char v_device[20] = {0};
+    float v_hmotnost, v_teplota, v_tlak, v_vlhkost;
+    
+    int n = sscanf(receivedText.c_str() + sync_word_length, "%s %f %f %f %f", v_device, &v_hmotnost, &v_teplota, &v_tlak, &v_vlhkost);
+    if (n != 5 || String(v_device) != "arduino_1"){
+        return;
+    }
+  
    //rfm95_sendReply();
   
    Serial.print(F("\nGot message from device: "));
