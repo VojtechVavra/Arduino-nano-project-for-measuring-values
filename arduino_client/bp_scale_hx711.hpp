@@ -5,8 +5,8 @@
 // RobTillaart/HX711 library
 
 // HX711 circuit wiring
-const int LOADCELL_DOUT_PIN = 4;
-const int LOADCELL_SCK_PIN = 5;
+const int LOADCELL_DOUT = 4;
+const int LOADCELL_SCK = 5;
 
 const float SCALE_FACTOR = 2280.0f;    // this value is obtained by calibrating the scale with known weights
 
@@ -22,10 +22,10 @@ void Scale_Setup()
      // By omitting the gain factor parameter, the library
      // default "128" (Channel A) is used here.
      
-     scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
+     scale.begin(LOADCELL_DOUT, LOADCELL_SCK_PIN);
      
      //Serial.println("Before setting up the scale:");
-     scale.set_scale(SCALE_FACTOR);   //2280.0f
+     scale.set_scale(SCALE_FACTOR);
      scale.tare();                    // reset the scale to 0
     
      //Serial.println("After setting up the scale:");
