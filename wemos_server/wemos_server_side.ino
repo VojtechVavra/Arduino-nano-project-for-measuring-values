@@ -135,7 +135,7 @@ void onReceive(int packetSize)
     char v_device[20] = {0};
     float v_hmotnost, v_teplota, v_tlak, v_vlhkost;
     
-    int n = sscanf(receivedText.c_str() + sync_word_length, "%s %f %f %f %f", v_device, &v_hmotnost, &v_teplota, &v_tlak, &v_vlhkost);
+    int n = sscanf(receivedText.c_str() + sync_word_length, "%19s %f %f %f %f", v_device, &v_hmotnost, &v_teplota, &v_tlak, &v_vlhkost);
     if (n != 5 || String(v_device) != "arduino_1"){
         return;
     }
