@@ -228,7 +228,7 @@ void rfm95_sendReply()
     // Send a reply message
     Serial.println("Sending reply message");
     
-    byte syncWord[2] = {0xFF, 0xFF};
+    byte syncWord[3] = {0xFF, 0xFF, 0x0};
     String syncWordTex = (char*)syncWord;
     String text = syncWordTex + "  Got message";
     
